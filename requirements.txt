@@ -1,3 +1,4 @@
 firebase-admin
 python-dotenv
 pyzk
+tqdm

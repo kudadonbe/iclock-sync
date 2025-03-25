@@ -1,2 +1,4 @@
-config/firebase-key.json
 .env
+iclock_sync.egg-info
+output/*
+config/firebase-key.json

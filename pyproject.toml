@@ -1,0 +1,18 @@
+[project]
+name = "iclock-sync"
+version = "1.0.0"
+description = "Sync attendance logs from ZKTeco iClock devices to Firestore"
+authors = [
+  { name="Hussain Shareef", email="hussain.shareef@gmail.com" }
+]
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+  "firebase-admin",
+  "python-dotenv",
+  "pyzk @ git+https://github.com/fananimi/pyzk.git@50637985b56c3312bf80346c022ebfa567e02808",
+  "tqdm"
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
