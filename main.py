@@ -1,7 +1,7 @@
 from config.settings import DEVICE_IPS
 from core.iclock_connector import fetch_logs_from_multiple_devices
 from core.normalizer import normalize_sdk_log
-# from core.firestore_uploader import upload_log_to_firestore
+from core.firestore_uploader import upload_log_to_firestore
 
 import json
 import os
@@ -29,6 +29,6 @@ with open(output_file, "w", encoding="utf-8") as f:
 print(f"\n✅ Saved {len(normalized_logs)} logs to {output_file}")
 
 # ☁️ Optional: Upload to Firestore (commented out for now)
-# for log in normalized_logs:
-#     upload_log_to_firestore(log)
-# print("☁️ Upload to Firestore complete.")
+for log in normalized_logs:
+    upload_log_to_firestore(log)
+print("☁️ Upload to Firestore complete.")
