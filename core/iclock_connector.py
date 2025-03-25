@@ -19,21 +19,16 @@ def get_logs_from_device(device_ip: str):
     except Exception as e:
         print(f"❌ Error connecting to {device_ip}: {e}")
         return []
-
+    
+    
 def fetch_logs_from_multiple_devices(devices: list):
     """
     Fetches and combines logs from multiple iClock devices.
     :param devices: List of IP addresses
-    :return: Combined list of parsed log dictionaries
+    :return: Combined list of raw SDK log objects
     """
     all_logs = []
     for ip in devices:
         raw_logs = get_logs_from_device(ip)
-        for log in raw_logs:
-            all_logs.append({
-                "staffId": str(log.user_id),
-                "timestamp": log.timestamp,
-                "status": log.status,
-                "workCode": log.punch
-            })
+        all_logs.extend(raw_logs)
     return all_logs

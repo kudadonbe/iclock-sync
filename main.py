@@ -7,6 +7,9 @@ import json
 import os
 from datetime import datetime
 
+
+print("🔍 Device IPs loaded:", DEVICE_IPS)
+
 # 📁 Create output folder if not exists
 OUTPUT_DIR = "output"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
