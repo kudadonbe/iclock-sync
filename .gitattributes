@@ -1,2 +1,13 @@
-# Auto detect text files and perform LF normalization
+# Set default behavior for text files
 * text=auto
+
+# Treat dotenv files as text
+.env text
+.env.example text
+
+# Keep JSON files as UTF-8 text
+*.json text
+
+# Ensure shell and Python scripts use LF
+*.sh text eol=lf
+*.py text eol=lf
