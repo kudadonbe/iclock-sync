@@ -12,14 +12,16 @@ import logging
 import json
 import argparse
 import time
+import platform
 from datetime import datetime, timedelta
 from tqdm import tqdm
 from pathlib import Path
 
 # ----------------------------------------
-# 📝 Setup logging (Linux-friendly path)
+# 📝 Setup logging (Cross-platform path)
 # ----------------------------------------
-LOG_DIR = Path("logs")
+# Use logs folder in project directory for Windows and Linux compatibility
+LOG_DIR = Path(__file__).parent / "logs"
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 log_file = LOG_DIR / f"sync_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
 
@@ -39,7 +41,7 @@ parser.add_argument("--since", type=int, default=None, help="Include logs from p
 parser.add_argument("--loop", type=int, help="Run repeatedly every X minutes")
 args = parser.parse_args()
 
-OUTPUT_DIR = Path("output")
+OUTPUT_DIR = Path(__file__).parent / "output"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 
