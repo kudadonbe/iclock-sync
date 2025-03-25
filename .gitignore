@@ -3,3 +3,4 @@ iclock_sync.egg-info
 output/*
 config/firebase-key.json
 cache/*
+logs/*
