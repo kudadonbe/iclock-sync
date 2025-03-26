@@ -12,6 +12,7 @@ import logging
 import json
 import argparse
 import time
+import platform
 from datetime import datetime, timedelta
 from tqdm import tqdm
 from pathlib import Path
