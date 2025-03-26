@@ -55,14 +55,6 @@ iclock-sync/
 
 ## ⚙️ Usage
 
-### ✅ Initial Setup: Build Cache
-
-To build or rebuild the local cache from existing output files:
-
-```bash
-python scripts/build_cache_from_output.py
-```
-
 ### 🚀 Sync Logs to Firestore
 
 Fetch logs from devices and upload to Firestore:
