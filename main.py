@@ -1,5 +1,5 @@
-from config.settings import DEVICE_IPS
-from core.iclock_connector import fetch_logs_from_multiple_devices
+from config.settings import DEVICES
+from core.iclock_connector import get_logs_from_device
 from core.normalizer import normalize_sdk_log
 from core.firestore_uploader import upload_log_to_firestore
 from core.utils import (
@@ -17,9 +17,9 @@ from tqdm import tqdm
 from pathlib import Path
 
 # ----------------------------------------
-# 📝 Setup logging (Linux-friendly path)
+# 📝 Setup logging (Cross-platform path)
 # ----------------------------------------
-LOG_DIR = Path("logs")
+LOG_DIR = Path(__file__).parent / "logs"
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 log_file = LOG_DIR / f"sync_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
 
@@ -39,13 +39,15 @@ parser.add_argument("--since", type=int, default=None, help="Include logs from p
 parser.add_argument("--loop", type=int, help="Run repeatedly every X minutes")
 args = parser.parse_args()
 
-OUTPUT_DIR = Path("output")
+OUTPUT_DIR = Path(__file__).parent / "output"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 
 def run_upload():
     logging.info("iClock sync started.")
-    print("🔍 Device IPs loaded:", DEVICE_IPS)
+    device_names = [device['name'] for device in DEVICES]
+    print("🔍 Devices loaded:", device_names)
+    logging.info(f"Devices loaded: {DEVICES}")
 
     # ----------------------------------------
     # 📅 Prepare output file with timestamp
@@ -56,7 +58,19 @@ def run_upload():
     # ----------------------------------------
     # 🔄 Fetch logs from devices
     # ----------------------------------------
-    raw_logs = fetch_logs_from_multiple_devices(DEVICE_IPS)
+    raw_logs = []
+    for device in DEVICES:
+        print(f"✅ Connecting to {device['name']}")
+        logging.info(f"Connecting to {device['name']} at {device['ip']}")
+        device_logs = get_logs_from_device(device['ip'])
+        print(f"📌 Retrieved {len(device_logs)} records from {device['name']}")
+        logging.info(f"Retrieved {len(device_logs)} records from {device['name']} ({device['ip']})")
+        raw_logs.extend(device_logs)
+
+    #  Add the total here:
+    total_records = len(raw_logs)
+    print(f"📌 Total records fetched from all devices: {total_records}")
+    logging.info(f"Total records fetched from all devices: {total_records}")
 
     # Filter logs by --since days if provided
     if args.since is not None:
@@ -84,7 +98,7 @@ def run_upload():
     new_logs = []
     uploaded_count = 0
 
-    for log in tqdm(logs_to_upload, desc="☁️ Uploading logs", unit="log"):
+    for log in tqdm(logs_to_upload, desc="☁️ Uploading logs", unit=" log"):
         if args.dry_run:
             new_logs.append(log)
         else:
@@ -107,10 +121,10 @@ def run_upload():
 
     if args.dry_run:
         print(f"\n🧪 Dry run complete — {len(new_logs)} logs *would* be uploaded.")
-        logging.info(f"Dry run complete — {len(new_logs)} logs would be uploaded.")
+        logging.info(f"Dry run complete - {len(new_logs)} logs would be uploaded.")
     else:
         print(f"\n☁️ Upload complete — {uploaded_count} new logs uploaded.")
-        logging.info(f"Upload complete — {uploaded_count} new logs uploaded.")
+        logging.info(f"Upload complete - {uploaded_count} new logs uploaded.")
 
         if new_logs:
             with open(output_file, "w", encoding="utf-8") as f:

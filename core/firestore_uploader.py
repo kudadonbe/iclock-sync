@@ -1,6 +1,7 @@
 import firebase_admin
 from firebase_admin import credentials, firestore
 from config.settings import FIREBASE_KEY_PATH
+import logging
 
 # Initialize Firebase
 if not firebase_admin._apps:
@@ -12,11 +13,12 @@ db = firestore.client()
 def upload_log_to_firestore(log: dict):
     """
     Uploads a single log to Firestore if it doesn't already exist.
-    Returns True if uploaded, False if already existed.
+    Returns True if uploaded, False if already exists.
     """
     doc_ref = db.collection("staffAttendanceLogs").document(log["doc_id"])
+    
     if doc_ref.get().exists:
-        print(f"⚠️ Already exists: {log['doc_id']}")
+        logging.info(f"Already exists: {log['doc_id']}")
         return False
 
     doc_data = {
@@ -28,5 +30,4 @@ def upload_log_to_firestore(log: dict):
     }
 
     doc_ref.set(doc_data)
-    # print(f"☁️ Uploaded: {log['staffId']} @ {log['timestamp']}")
     return True

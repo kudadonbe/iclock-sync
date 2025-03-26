@@ -1,6 +1,16 @@
+# Sensitive and environment-specific
 .env
-iclock_sync.egg-info
-output/*
 config/firebase-key.json
-cache/*
-logs/*
+
+# Python cache and build files
+__pycache__/
+*.py[cod]
+iclock_sync.egg-info/
+
+# Output, cache, and log files
+output/
+cache/
+logs/
+
+# Virtual environments
+.venv/

@@ -1,4 +1,4 @@
-import json
+import logging
 from zk import ZK
 from datetime import datetime
 
@@ -11,16 +11,13 @@ def get_logs_from_device(device_ip: str):
     zk = ZK(device_ip, port=4370, timeout=5)
     try:
         conn = zk.connect()
-        print(f"✅ Connected to device at {device_ip}")
         logs = conn.get_attendance()
         conn.disconnect()
-        print(f"📌 Retrieved {len(logs)} records from {device_ip}")
         return logs
     except Exception as e:
-        print(f"❌ Error connecting to {device_ip}: {e}")
+        logging.error(f"Error connecting to {device_ip}: {e}")
         return []
-    
-    
+
 def fetch_logs_from_multiple_devices(devices: list):
     """
     Fetches and combines logs from multiple iClock devices.

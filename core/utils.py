@@ -4,10 +4,8 @@ import glob
 import json
 import hashlib
 import os
+import logging
 from datetime import datetime
-
-
-
 
 def format_timestamp_str(timestamp: datetime) -> str:
     """
@@ -23,13 +21,9 @@ def format_timestamp_iso(timestamp: datetime) -> str:
     """
     return timestamp.strftime('%Y-%m-%dT%H:%M:%SZ')
 
-
-
 def generate_doc_id(staff_id: str, timestamp: datetime):
-    
     raw_id = f"{staff_id}_{format_timestamp_str(timestamp)}"
     return hashlib.md5(raw_id.encode()).hexdigest()
-
 
 def load_uploaded_doc_ids(output_dir: str = "output") -> set:
     """
@@ -43,9 +37,8 @@ def load_uploaded_doc_ids(output_dir: str = "output") -> set:
                 for log in data:
                     doc_ids.add(log["doc_id"])
         except Exception as e:
-            print(f"⚠️ Skipped {file}: {e}")
-    return doc_ids  # ✅ Make sure to return the set
-
+            logging.warning(f"Skipped file {file}: {e}")
+    return doc_ids
 
 def load_uploaded_ids_cache(cache_path: str = "cache/uploaded_ids_cache.json") -> set:
     if not os.path.exists(cache_path):
@@ -54,13 +47,9 @@ def load_uploaded_ids_cache(cache_path: str = "cache/uploaded_ids_cache.json") -
         try:
             return set(json.load(f))
         except Exception as e:
-            print(f"⚠️ Failed to read cache: {e}")
+            logging.warning(f"Failed to read cache {cache_path}: {e}")
             return set()
-        
 
 def save_uploaded_ids_cache(doc_ids: set, cache_path: str = "cache/uploaded_ids_cache.json"):
     with open(cache_path, "w", encoding="utf-8") as f:
         json.dump(list(doc_ids), f, indent=4)
-
-
-
