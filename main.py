@@ -127,8 +127,6 @@ def run_upload():
                 if success:
                     new_logs.append(log)
                     uploaded_count += 1
-                else:
-                    logging.warning(f"Log upload failed: {log['doc_id']}")
             except Exception as e:
                 logging.error(f"Error uploading log {log['doc_id']}: {e}")
 
