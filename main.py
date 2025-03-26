@@ -36,7 +36,9 @@ from pathlib import Path
 # ----------------------------------------
 LOG_DIR = Path(__file__).parent / "logs"
 LOG_DIR.mkdir(parents=True, exist_ok=True)
-log_file = LOG_DIR / f"sync_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
+
+timestamp_str = datetime.now().strftime('%Y%m%d_%H%M%S')  # ✅ Consistent format
+log_file = LOG_DIR / f"sync_{timestamp_str}.log"
 
 logging.basicConfig(
     filename=str(log_file),
@@ -68,8 +70,8 @@ def run_upload():
     # ----------------------------------------
     # Prepare Output File
     # ----------------------------------------
-    timestamp_str = format_timestamp_str(datetime.now()).replace(":", "-").replace(" ", "_")
-    output_file = OUTPUT_DIR / f"logs_{timestamp_str}.json"
+    run_timestamp_str = datetime.now().strftime('%Y%m%d_%H%M%S')
+    output_file = OUTPUT_DIR / f"logs_{run_timestamp_str}.json"
 
     # ----------------------------------------
     # Fetch Logs from Devices
