@@ -37,8 +37,6 @@ iclock-sync/
 │   ├── sync_20250XXX_1X0X21.log
 ├── output/                            # Output logs (JSON)
 │   ├── logs_202X-0X-XX_1X-3X-X0.json
-├── scripts/                           # Utility and maintenance scripts
-│   └── build_cache_from_output.py
 ├── .env                               # Environment-specific variables (private)
 ├── .env.example                       # Template for environment variables
 ├── .gitattributes                     # Git attributes configuration
@@ -48,7 +46,6 @@ iclock-sync/
 ├── README.md                          # Project documentation
 ├── requirements.lock.txt              # Locked dependencies
 └── requirements.txt                   # Python dependencies
-
 ```
 
 ---
@@ -139,4 +136,3 @@ This project is licensed under the **MIT License**, allowing free use for person
 ## 👌 Contributing
 
 Contributions are welcome! Feel free to fork the repository, implement changes or improvements, and submit pull requests.
-
