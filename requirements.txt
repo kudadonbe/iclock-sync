@@ -1,4 +1,21 @@
+# ---------------------------------------------
+# requirements.txt - Project Python Dependencies
+#
+# Defines required Python libraries for the iclock-sync project.
+# Used by pip to install project dependencies.
+#
+# Author: Hussain Shareef (@kudadonbe)
+# Date: 2025-03-26
+# ---------------------------------------------
+
+# Firebase Admin SDK for Python (Firestore integration)
 firebase-admin
+
+# Load environment variables from .env files
 python-dotenv
+
+# ZKTeco SDK for Python (attendance device integration)
 pyzk
+
+# Progress bar for Python command-line interfaces
 tqdm

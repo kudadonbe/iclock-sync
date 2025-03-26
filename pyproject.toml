@@ -1,3 +1,14 @@
+# ---------------------------------------------
+# pyproject.toml - Project Metadata & Configuration
+#
+# Defines project metadata, dependencies, and packaging configurations.
+#
+# Used by build systems (like setuptools) to install and distribute the package.
+#
+# Author: Hussain Shareef (@kudadonbe)
+# Date: 2025-03-26
+# ---------------------------------------------
+
 [project]
 name = "iclock-sync"
 version = "1.0.0"
@@ -10,9 +21,11 @@ requires-python = ">=3.8"
 dependencies = [
   "firebase-admin",
   "python-dotenv",
+  # pyzk library from specific GitHub commit for ZKTeco iClock SDK
   "pyzk @ git+https://github.com/fananimi/pyzk.git@50637985b56c3312bf80346c022ebfa567e02808",
   "tqdm"
 ]
 
 [tool.setuptools.packages.find]
+# Look for Python packages/modules in the current directory
 where = ["."]
