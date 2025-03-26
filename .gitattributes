@@ -1,13 +1,24 @@
-# Set default behavior for text files
+# ---------------------------------------------
+# .gitattributes - Git file attribute definitions
+#
+# Controls how files are treated in Git, including line endings and text encoding.
+#
+# Ensures consistent behavior across platforms (Windows, macOS, Linux).
+#
+# Author: Hussain Shareef (@kudadonbe)
+# Date: 2025-03-26
+# ---------------------------------------------
+
+# Default behavior for all text files
 * text=auto
 
-# Treat dotenv files as text
+# Explicitly handle dotenv (.env) files as plain text
 .env text
 .env.example text
 
-# Keep JSON files as UTF-8 text
+# Explicitly set JSON files as UTF-8 encoded text
 *.json text
 
-# Ensure shell and Python scripts use LF
+# Force shell and Python scripts to always use LF (Unix-style) line endings
 *.sh text eol=lf
 *.py text eol=lf

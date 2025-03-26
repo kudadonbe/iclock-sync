@@ -1,120 +1,142 @@
 # iClock-Sync
 
-**iClock-Sync** is a Python-based tool that fetches and uploads attendance logs from ZKTeco iClock devices to Firestore. Built for seamless integration with school systems like **SchoolSync**, it's modular and expandable to support other databases in the future (MySQL, PostgreSQL, MongoDB, etc).
+**iClock-Sync** is a Python-based tool designed to fetch and upload attendance logs from ZKTeco iClock devices directly to Google Firestore. It integrates seamlessly with school management systems like **SchoolSync** and is built modularly, ensuring flexibility for future expansions to support databases such as MySQL, PostgreSQL, MongoDB, and more.
 
 ---
 
 ## 🚀 Features
 
-- 🔄 Fetch attendance logs from multiple iClock devices
-- 🧹 Normalize logs with consistent structure and unique IDs
-- ☁️ Upload only new records to Firestore (deduplication supported)
-- 💾 Save uploaded logs locally for auditing
-- 🧠 Smart cache system using `uploaded_ids_cache.json`
-- 🧪 `--dry-run` mode for safe testing
-- ⏳ `--since` filter for recent log uploads
-- 🔁 `--loop` mode for running as a periodic sync service
+- 🔄 **Multi-Device Support:** Fetch attendance logs from multiple ZKTeco iClock devices.
+- 🧹 **Structured Normalization:** Logs are consistently formatted with unique IDs.
+- ☁️ **Firestore Integration:** Uploads only new, deduplicated records.
+- 💾 **Local Audit Logs:** Save uploaded logs locally for verification and auditing.
+- 🧠 **Efficient Caching:** Smart cache management using `uploaded_ids_cache.json`.
+- 🧪 **Dry-Run Mode:** Safely preview uploads without altering Firestore data.
+- ⏳ **Date Filtering:** Easily filter logs to upload only recent records.
+- 🔁 **Automated Syncing:** Supports periodic syncing with built-in looping capabilities.
 
 ---
 
-## 📁 Folder Structure (Recommended)
+## 📁 Recommended Project Structure
 
 ```
 iclock-sync/
-├── core/                        # Core logic (connector, normalizer, Firestore uploader, utils)
-├── scripts/                     # One-time or support scripts
-│   └── build_cache_from_output.py
-├── cache/                       # Local cache (auto-created)
+├── cache/                             # Cached data
 │   └── uploaded_ids_cache.json
-├── output/                      # Log outputs saved as JSON
-│   └── logs_YYYY-MM-DD_HH-MM-SS.json
-├── main.py                      # Entry script for syncing
-├── requirements.txt             # Python dependencies
-├── .env                         # Environment variables (optional)
-└── README.md
+├── config/                            # Configuration files
+│   ├── firebase-key.json
+│   └── settings.py
+├── core/                              # Core application logic
+│   ├── firestore_uploader.py
+│   ├── iclock_connector.py
+│   ├── normalizer.py
+│   └── utils.py
+├── data/                              # Sample or test data
+│   ├── sample_logs.txt
+├── logs/                              # Application log files
+│   ├── sync_20250XXX_1X0X21.log
+├── output/                            # Output logs (JSON)
+│   ├── logs_202X-0X-XX_1X-3X-X0.json
+├── scripts/                           # Utility and maintenance scripts
+│   └── build_cache_from_output.py
+├── .env                               # Environment-specific variables (private)
+├── .env.example                       # Template for environment variables
+├── .gitattributes                     # Git attributes configuration
+├── .gitignore                         # Ignored files for version control
+├── main.py                            # Main application entry-point
+├── pyproject.toml                     # Project metadata and configuration
+├── README.md                          # Project documentation
+├── requirements.lock.txt              # Locked dependencies
+└── requirements.txt                   # Python dependencies
+
 ```
 
 ---
 
 ## ⚙️ Usage
 
-### ✅ One-time: Build local cache from existing output files
+### 🚀 Sync Logs to Firestore
 
-```bash
-python scripts/build_cache_from_output.py
-```
-
-### 🚀 Sync from devices and upload to Firestore
+Fetch logs from devices and upload to Firestore:
 
 ```bash
 python main.py
 ```
 
-### 🧪 Dry-run mode (preview without uploading)
+### 🧪 Dry-Run (Preview Mode)
+
+Safely preview what will be uploaded without making changes:
 
 ```bash
 python main.py --dry-run
 ```
 
-### ⏳ Upload only logs from last 2 days
+### ⏳ Recent Logs Only
+
+Upload logs from the past two days:
 
 ```bash
 python main.py --since 2
 ```
 
-### 🔁 Run every 5 minutes (auto-loop)
+### 🔁 Periodic Sync (Looping)
+
+Automatically sync every 5 minutes (useful for background operations):
 
 ```bash
 python main.py --loop 5 --since 1
 ```
 
-You can combine flags as needed:
+### ⚡ Combine Flags
+
+Combine available flags according to your requirements:
+
 ```bash
 python main.py --dry-run --since 1
 ```
 
 ---
 
-## 🔐 Environment & Secrets
+## 🔐 Environment and Secrets
 
-You should have the following in place:
+Ensure the following configurations and secrets are properly managed:
 
-- `firebase-key.json` for Firestore access
-- `.env` file for secrets and config (optional)
-- `FIREBASE_KEY_PATH` in `config/settings.py` or `.env`
-
----
-
-## 🛡️ Safety and Reliability
-
-- Uploads are **idempotent** — same log will never be uploaded twice
-- All logs are locally saved for verification
-- Works with multiple devices
+- **Firebase credentials**: `firebase-key.json` (stored securely).
+- Optional configuration: `.env` file for sensitive settings.
+- Ensure the path `FIREBASE_KEY_PATH` is correctly set in `config/settings.py` or your `.env` file.
 
 ---
 
-## 💡 Future Improvements
+## 🛡️ Reliability and Safety
 
-- Support for MySQL / MongoDB / other DBs
-- Web dashboard for monitoring logs
-- FastAPI service layer for integration
+- **Idempotent Operations:** Prevents duplicate log entries.
+- **Audit Trail:** Locally saves all uploaded logs for easy verification.
+- **Multi-Device Compatible:** Handles multiple ZKTeco devices seamlessly.
 
 ---
 
-## 🧑‍💻 Built by
+## 💡 Planned Future Improvements
 
-**Hussain Shareef**  
-Makunudhoo School | Maldives 🇲🇻
+- Integration with additional databases: MySQL, PostgreSQL, MongoDB.
+- Web-based dashboard for monitoring attendance logs.
+- REST API layer (FastAPI) for easier integration with external services.
+
+---
+
+## 🧑‍💻 Author
+
+**Hussain Shareef (@kudadonbe)**\
+Makunudhoo School, Maldives 🇲🇻
 
 ---
 
 ## 📄 License
 
-MIT License — free for personal and commercial use.
+This project is licensed under the **MIT License**, allowing free use for personal and commercial applications.
 
 ---
 
 ## 👌 Contributing
 
-Feel free to fork this repo, make changes, and submit pull requests!
+Contributions are welcome! Feel free to fork the repository, implement changes or improvements, and submit pull requests.
 

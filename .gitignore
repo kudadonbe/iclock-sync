@@ -1,6 +1,30 @@
+# ---------------------------------------------
+# .gitignore - Git Ignore Configuration
+#
+# Specifies intentionally untracked files and directories.
+#
+# Ensures sensitive information, build files, cache,
+# virtual environments, and logs remain local.
+#
+# Author: Hussain Shareef (@kudadonbe)
+# Date: 2025-03-26
+# ---------------------------------------------
+
+# Environment-specific and sensitive configuration
 .env
-iclock_sync.egg-info
-output/*
 config/firebase-key.json
-cache/*
-logs/*
+
+# Python cache and bytecode files
+__pycache__/
+*.py[cod]
+
+# Python packaging metadata
+iclock_sync.egg-info/
+
+# Output data, caches, and logs
+output/
+cache/
+logs/
+
+# Virtual environment directories
+.venv/

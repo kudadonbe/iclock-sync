@@ -1,5 +1,20 @@
-from config.settings import DEVICE_IPS
-from core.iclock_connector import fetch_logs_from_multiple_devices
+"""
+main.py - Entry point for iClock-Sync application
+
+This script connects to configured ZKTeco iClock devices, retrieves attendance logs,
+normalizes the logs, filters already uploaded records, and uploads new logs to Google Firestore.
+
+Supports command-line arguments for:
+    --dry-run: Preview uploads without performing actual uploads.
+    --since X: Include only logs from the past X days.
+    --loop X: Continuously run the sync every X minutes.
+
+Author: Hussain Shareef (@kudadonbe)
+Date: 2025-03-26
+"""
+
+from config.settings import DEVICES
+from core.iclock_connector import get_logs_from_device
 from core.normalizer import normalize_sdk_log
 from core.firestore_uploader import upload_log_to_firestore
 from core.utils import (
@@ -12,15 +27,13 @@ import logging
 import json
 import argparse
 import time
-import platform
 from datetime import datetime, timedelta
 from tqdm import tqdm
 from pathlib import Path
 
 # ----------------------------------------
-# 📝 Setup logging (Cross-platform path)
+# Logging Configuration
 # ----------------------------------------
-# Use logs folder in project directory for Windows and Linux compatibility
 LOG_DIR = Path(__file__).parent / "logs"
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 log_file = LOG_DIR / f"sync_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
@@ -33,7 +46,7 @@ logging.basicConfig(
 )
 
 # ----------------------------------------
-# 📌 Parse command-line arguments
+# Parse Command-Line Arguments
 # ----------------------------------------
 parser = argparse.ArgumentParser(description="Upload iClock logs to Firestore")
 parser.add_argument("--dry-run", action="store_true", help="Preview upload without performing it")
@@ -46,32 +59,51 @@ OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 
 def run_upload():
+    """Executes the full log retrieval and upload process."""
     logging.info("iClock sync started.")
-    print("🔍 Device IPs loaded:", DEVICE_IPS)
+    device_names = [device['name'] for device in DEVICES]
+    print("🔍 Devices loaded:", device_names)
+    logging.info(f"Devices loaded: {DEVICES}")
 
     # ----------------------------------------
-    # 📅 Prepare output file with timestamp
+    # Prepare Output File
     # ----------------------------------------
     timestamp_str = format_timestamp_str(datetime.now()).replace(":", "-").replace(" ", "_")
     output_file = OUTPUT_DIR / f"logs_{timestamp_str}.json"
 
     # ----------------------------------------
-    # 🔄 Fetch logs from devices
+    # Fetch Logs from Devices
     # ----------------------------------------
-    raw_logs = fetch_logs_from_multiple_devices(DEVICE_IPS)
+    raw_logs = []
+    for device in DEVICES:
+        print(f"✅ Connecting to {device['name']}")
+        logging.info(f"Connecting to {device['name']} at {device['ip']}")
+        device_logs = get_logs_from_device(device['ip'])
+        print(f"📌 Retrieved {len(device_logs)} records from {device['name']}")
+        logging.info(f"Retrieved {len(device_logs)} records from {device['name']} ({device['ip']})")
+        raw_logs.extend(device_logs)
 
-    # Filter logs by --since days if provided
+    total_records = len(raw_logs)
+    print(f"📌 Total records fetched from all devices: {total_records}")
+    logging.info(f"Total records fetched from all devices: {total_records}")
+
+    # Filter logs by "since" argument, if provided
     if args.since is not None:
         cutoff_time = datetime.now() - timedelta(days=args.since)
         raw_logs = [log for log in raw_logs if log.timestamp >= cutoff_time]
         logging.info(f"Filtered logs from past {args.since} days.")
 
+    # ----------------------------------------
+    # Normalize Logs
+    # ----------------------------------------
     normalized_logs = [normalize_sdk_log(log) for log in raw_logs]
 
-    # Load uploaded doc_ids from cache
+    # Load cached uploaded log IDs
     uploaded_doc_ids = load_uploaded_ids_cache()
 
-    # Filter already-uploaded logs
+    # ----------------------------------------
+    # Filter Already Uploaded Logs
+    # ----------------------------------------
     skipped_count = 0
     logs_to_upload = []
     for log in normalized_logs:
@@ -81,12 +113,12 @@ def run_upload():
         logs_to_upload.append(log)
 
     # ----------------------------------------
-    # ☁️ Upload or preview logs with progress bar
+    # Upload Logs to Firestore
     # ----------------------------------------
     new_logs = []
     uploaded_count = 0
 
-    for log in tqdm(logs_to_upload, desc="☁️ Uploading logs", unit="log"):
+    for log in tqdm(logs_to_upload, desc="☁️ Uploading logs", unit=" log"):
         if args.dry_run:
             new_logs.append(log)
         else:
@@ -101,7 +133,7 @@ def run_upload():
                 logging.error(f"Error uploading log {log['doc_id']}: {e}")
 
     # ----------------------------------------
-    # 📊 Final summary output
+    # Final Summary
     # ----------------------------------------
     if skipped_count:
         logging.info(f"Skipped {skipped_count} already-uploaded logs.")
@@ -109,10 +141,10 @@ def run_upload():
 
     if args.dry_run:
         print(f"\n🧪 Dry run complete — {len(new_logs)} logs *would* be uploaded.")
-        logging.info(f"Dry run complete — {len(new_logs)} logs would be uploaded.")
+        logging.info(f"Dry run complete - {len(new_logs)} logs would be uploaded.")
     else:
         print(f"\n☁️ Upload complete — {uploaded_count} new logs uploaded.")
-        logging.info(f"Upload complete — {uploaded_count} new logs uploaded.")
+        logging.info(f"Upload complete - {uploaded_count} new logs uploaded.")
 
         if new_logs:
             with open(output_file, "w", encoding="utf-8") as f:
@@ -128,6 +160,7 @@ def run_upload():
 
 
 def main():
+    """Main execution function, handles looping behavior."""
     if args.loop:
         print(f"\n🔁 Starting loop: syncing every {args.loop} minutes (Ctrl+C to stop)\n")
         logging.info(f"Starting sync loop every {args.loop} minutes.")
@@ -143,7 +176,8 @@ def main():
 
 
 # ----------------------------------------
-# 🚀 Start the app
+# Start the app
 # ----------------------------------------
+
 if __name__ == "__main__":
     main()
