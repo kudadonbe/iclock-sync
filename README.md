@@ -17,6 +17,52 @@
 
 ---
 
+## 🧰 Installation & Setup
+
+### 1. Clone the Repository
+```bash
+git clone https://github.com/your-username/iclock-sync.git
+cd iclock-sync
+```
+
+### 2. Install Dependencies
+We recommend using a virtual environment based on your operating system:
+
+#### 🔹 macOS / Linux
+```bash
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
+#### 🔹 Windows
+```bash
+python -m venv venv
+venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+### 3. Add Firebase Credentials
+Place your Firebase Admin SDK credentials in:
+```
+config/firebase-key.json
+```
+> You can generate this file from your Firebase project settings.
+
+### 4. Configure Your Settings
+Update `config/settings.py` or create a `.env` file based on `.env.example`:
+```env
+FIREBASE_KEY_PATH=config/firebase-key.json
+```
+
+### 5. (Optional) Test Run
+Verify setup using dry-run:
+```bash
+python main.py --dry-run
+```
+
+---
+
 ## 📁 Recommended Project Structure
 
 ```
@@ -34,9 +80,9 @@ iclock-sync/
 ├── data/                              # Sample or test data
 │   ├── sample_logs.txt
 ├── logs/                              # Application log files
-│   ├── sync_20250XXX_1X0X21.log
+│   ├── sync_20250326_143020.log
 ├── output/                            # Output logs (JSON)
-│   ├── logs_202X-0X-XX_1X-3X-X0.json
+│   ├── logs_20250326_143020.json
 ├── .env                               # Environment-specific variables (private)
 ├── .env.example                       # Template for environment variables
 ├── .gitattributes                     # Git attributes configuration
@@ -53,41 +99,31 @@ iclock-sync/
 ## ⚙️ Usage
 
 ### 🚀 Sync Logs to Firestore
-
 Fetch logs from devices and upload to Firestore:
-
 ```bash
 python main.py
 ```
 
 ### 🧪 Dry-Run (Preview Mode)
-
 Safely preview what will be uploaded without making changes:
-
 ```bash
 python main.py --dry-run
 ```
 
 ### ⏳ Recent Logs Only
-
 Upload logs from the past two days:
-
 ```bash
 python main.py --since 2
 ```
 
 ### 🔁 Periodic Sync (Looping)
-
 Automatically sync every 5 minutes (useful for background operations):
-
 ```bash
 python main.py --loop 5 --since 1
 ```
 
 ### ⚡ Combine Flags
-
 Combine available flags according to your requirements:
-
 ```bash
 python main.py --dry-run --since 1
 ```
@@ -136,3 +172,17 @@ This project is licensed under the **MIT License**, allowing free use for person
 ## 👌 Contributing
 
 Contributions are welcome! Feel free to fork the repository, implement changes or improvements, and submit pull requests.
+
+---
+
+## 🙏 Acknowledgements
+
+This project depends heavily on the incredible open-source work of others, especially:
+
+- [**pyzk**](https://github.com/fananimi/pyzk) – A Python library for interacting with ZKTeco biometric devices
+- [firebase-admin](https://pypi.org/project/firebase-admin/) – Firebase Admin SDK for server-side integration
+- [tqdm](https://pypi.org/project/tqdm/) – For progress bar support in CLI
+- [python-dotenv](https://pypi.org/project/python-dotenv/) – For loading environment variables from `.env` files
+
+Big thanks to all contributors and maintainers of these projects!
+
