@@ -40,3 +40,33 @@ def normalize_sdk_log(log):
         "status": int(log.status),
         "workCode": int(log.punch)
     }
+
+
+def convert_to_simple_log(log):
+    """
+    Converts a raw ZKTeco SDK log into a simplified dictionary format.
+
+    Parameters:
+        log: Raw attendance log object retrieved from ZKTeco device.
+             Expected attributes:
+             - user_id: The unique identifier of the staff member.
+             - timestamp: The timestamp of the attendance event.
+             - status: The attendance status (e.g., check-in or check-out).
+             - punch: Work code associated with the attendance log.
+
+    Returns:
+        dict: Simplified log dictionary with the following keys:
+              - user_id (str)
+              - date (str in YYYY-MM-DD format)
+              - time (str in HH:MM:SS format)
+              - punch_status (int)
+              - log_status (int)
+    """
+    return {
+        "user_id": str(log.user_id),
+        "date": log.timestamp.strftime("%Y-%m-%d"),
+        "time": log.timestamp.strftime("%H:%M:%S"),
+        "punch_status": log.punch,
+        "log_status": log.status,
+    }
+
