@@ -7,13 +7,14 @@
 ## 🚀 Features
 
 - 🔄 **Multi-Device Support:** Fetch attendance logs from multiple ZKTeco iClock devices.
-- 🧹 **Structured Normalization:** Logs are consistently formatted with unique IDs.
+- 🩹 **Structured Normalization:** Logs are consistently formatted with unique IDs.
 - ☁️ **Firestore Integration:** Uploads only new, deduplicated records.
 - 💾 **Local Audit Logs:** Save uploaded logs locally for verification and auditing.
 - 🧠 **Efficient Caching:** Smart cache management using `uploaded_ids_cache.json`.
 - 🧪 **Dry-Run Mode:** Safely preview uploads without altering Firestore data.
 - ⏳ **Date Filtering:** Easily filter logs to upload only recent records.
 - 🔁 **Automated Syncing:** Supports periodic syncing with built-in looping capabilities.
+- 🔧 **Command-Line Interface:** Run using `iclock --export-simple`, `--dry-run`, etc. after editable install.
 
 ---
 
@@ -25,40 +26,49 @@ git clone https://github.com/your-username/iclock-sync.git
 cd iclock-sync
 ```
 
-### 2. Install Dependencies
-We recommend using a virtual environment based on your operating system:
+### 2. Create and Activate Virtual Environment
+We recommend using a virtual environment based on your OS:
 
 #### 🔹 macOS / Linux
 ```bash
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
+python3 -m venv .venv
+source .venv/bin/activate
 ```
 
-#### 🔹 Windows
+#### 🔹 Windows (PowerShell)
+```powershell
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+```
+> ⚠️ If activation fails, run this once:
+> ```powershell
+> Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+> ```
+
+### 3. Install Dependencies
 ```bash
-python -m venv venv
-venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### 3. Add Firebase Credentials
+### 4. Editable Install for CLI Command (`iclock`)
+```bash
+pip install -e .
+```
+> If using `python -m cli`, also set:
+> ```powershell
+> $env:PYTHONPATH = "$(Get-Location)"
+> ```
+
+### 5. Add Firebase Credentials
 Place your Firebase Admin SDK credentials in:
 ```
 config/firebase-key.json
 ```
-> You can generate this file from your Firebase project settings.
 
-### 4. Configure Your Settings
-Update `config/settings.py` or create a `.env` file based on `.env.example`:
+### 6. Configure Your Settings
+Update `config/settings.py` or use `.env`:
 ```env
 FIREBASE_KEY_PATH=config/firebase-key.json
-```
-
-### 5. (Optional) Test Run
-Verify setup using dry-run:
-```bash
-python main.py --dry-run
 ```
 
 ---
@@ -80,18 +90,15 @@ iclock-sync/
 ├── data/                              # Sample or test data
 │   ├── sample_logs.txt
 ├── logs/                              # Application log files
-│   ├── sync_20250326_143020.log
+│   ├── sync_*.log
 ├── output/                            # Output logs (JSON)
-│   ├── logs_20250326_143020.json
-├── .env                               # Environment-specific variables (private)
-├── .env.example                       # Template for environment variables
-├── .gitattributes                     # Git attributes configuration
-├── .gitignore                         # Ignored files for version control
-├── main.py                            # Main application entry-point
-├── pyproject.toml                     # Project metadata and configuration
-├── README.md                          # Project documentation
-├── requirements.lock.txt              # Locked dependencies
-└── requirements.txt                   # Python dependencies
+│   ├── logs_*.json
+├── .env                               # Environment-specific variables
+├── .env.example                       # Template
+├── cli.py                             # Main CLI entry-point
+├── pyproject.toml                     # Project metadata
+├── requirements.txt                   # Python dependencies
+└── README.md                          # Project documentation
 ```
 
 ---
@@ -99,60 +106,67 @@ iclock-sync/
 ## ⚙️ Usage
 
 ### 🚀 Sync Logs to Firestore
-Fetch logs from devices and upload to Firestore:
 ```bash
-python main.py
+iclock
 ```
 
 ### 🧪 Dry-Run (Preview Mode)
-Safely preview what will be uploaded without making changes:
 ```bash
-python main.py --dry-run
+iclock --dry-run
 ```
 
 ### ⏳ Recent Logs Only
-Upload logs from the past two days:
 ```bash
-python main.py --since 2
+iclock --since 2
 ```
 
-### 🔁 Periodic Sync (Looping)
-Automatically sync every 5 minutes (useful for background operations):
+### ♻️ Periodic Sync (Looping)
 ```bash
-python main.py --loop 5 --since 1
+iclock --loop 5 --since 1
 ```
 
-### ⚡ Combine Flags
-Combine available flags according to your requirements:
+### ⚡ Export Logs
 ```bash
-python main.py --dry-run --since 1
+iclock --export-simple
+iclock --export-normalized
 ```
+
+### 🚀 Combine Options
+```bash
+iclock --dry-run --since 1
+```
+
+Or directly:
+```bash
+python -m cli --dry-run --since 1
+```
+> Use this if `iclock` command isn't recognized. Also set:
+> ```powershell
+> $env:PYTHONPATH = "$(Get-Location)"
+> ```
 
 ---
 
 ## 🔐 Environment and Secrets
 
-Ensure the following configurations and secrets are properly managed:
-
-- **Firebase credentials**: `firebase-key.json` (stored securely).
-- Optional configuration: `.env` file for sensitive settings.
-- Ensure the path `FIREBASE_KEY_PATH` is correctly set in `config/settings.py` or your `.env` file.
+- **Firebase credentials**: `firebase-key.json`
+- **Optional**: `.env` file with `FIREBASE_KEY_PATH`
 
 ---
 
 ## 🛡️ Reliability and Safety
 
-- **Idempotent Operations:** Prevents duplicate log entries.
-- **Audit Trail:** Locally saves all uploaded logs for easy verification.
-- **Multi-Device Compatible:** Handles multiple ZKTeco devices seamlessly.
+- Idempotent uploads (no duplicates)
+- Audit trail via output logs
+- Handles multiple devices gracefully
 
 ---
 
 ## 💡 Planned Future Improvements
 
-- Integration with additional databases: MySQL, PostgreSQL, MongoDB.
-- Web-based dashboard for monitoring attendance logs.
-- REST API layer (FastAPI) for easier integration with external services.
+- MySQL, PostgreSQL, MongoDB support
+- Web dashboard
+- REST API layer via FastAPI
 
 ---
 
@@ -165,24 +179,14 @@ Makunudhoo School, Maldives 🇲🇻
 
 ## 📄 License
 
-This project is licensed under the **MIT License**, allowing free use for personal and commercial applications.
-
----
-
-## 👌 Contributing
-
-Contributions are welcome! Feel free to fork the repository, implement changes or improvements, and submit pull requests.
+MIT License — free for personal/commercial use
 
 ---
 
 ## 🙏 Acknowledgements
 
-This project depends heavily on the incredible open-source work of others, especially:
-
-- [**pyzk**](https://github.com/fananimi/pyzk) – A Python library for interacting with ZKTeco biometric devices
-- [firebase-admin](https://pypi.org/project/firebase-admin/) – Firebase Admin SDK for server-side integration
-- [tqdm](https://pypi.org/project/tqdm/) – For progress bar support in CLI
-- [python-dotenv](https://pypi.org/project/python-dotenv/) – For loading environment variables from `.env` files
-
-Big thanks to all contributors and maintainers of these projects!
+- [pyzk](https://github.com/fananimi/pyzk)
+- [firebase-admin](https://pypi.org/project/firebase-admin/)
+- [tqdm](https://pypi.org/project/tqdm/)
+- [python-dotenv](https://pypi.org/project/python-dotenv/)
 
