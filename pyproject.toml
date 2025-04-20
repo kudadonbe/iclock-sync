@@ -29,3 +29,6 @@ dependencies = [
 [tool.setuptools.packages.find]
 # Look for Python packages/modules in the current directory
 where = ["."]
+
+[project.scripts]
+iclock = "cli:entrypoint"

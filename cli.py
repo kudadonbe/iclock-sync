@@ -1,5 +1,5 @@
 """
-main.py - Entry point for iClock-Sync application
+cli.py - Entry point for iClock-Sync application
 
 This script connects to configured ZKTeco iClock devices, retrieves attendance logs,
 normalizes the logs, filters already uploaded records, and uploads new logs to Google Firestore.
@@ -177,5 +177,5 @@ def main():
     else:
         run_upload()
 
-if __name__ == "__main__":
+def entrypoint():
     main()
