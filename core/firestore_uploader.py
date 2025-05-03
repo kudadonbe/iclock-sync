@@ -1,4 +1,5 @@
 """
+file: core\firestore_uploader.py
 firestore_uploader.py - Handles uploading attendance logs to Google Firestore
 
 This module initializes the connection to Firestore and provides functionality to upload individual
