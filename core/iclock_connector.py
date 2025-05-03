@@ -1,5 +1,5 @@
 """
-iclock_connector.py - Connects to ZKTeco iClock devices to fetch attendance logs
+core\iclock_connector.py - Connects to ZKTeco iClock devices to fetch attendance logs
 
 This module provides functionality for connecting to one or multiple ZKTeco iClock devices,
 retrieving raw attendance logs, and aggregating them for further processing.

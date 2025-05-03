@@ -44,6 +44,7 @@ def normalize_sdk_log(log):
 
 def convert_to_simple_log(log):
     """
+    core\normalizer.py
     Converts a raw ZKTeco SDK log into a simplified dictionary format.
 
     Parameters:

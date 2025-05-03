@@ -1,5 +1,5 @@
 """
-utils.py - Utility functions for the iClock-Sync project
+core\utils.py - Utility functions for the iClock-Sync project
 
 Provides common utilities required across different modules, including timestamp formatting,
 document ID generation, and caching mechanisms to handle previously uploaded logs.
