@@ -53,7 +53,7 @@ logging.basicConfig(
 parser = argparse.ArgumentParser(description="Upload iClock logs to Firestore")
 parser.add_argument("--dry-run", action="store_true", help="Preview upload without performing it")
 parser.add_argument("--since", type=int, default=None, help="Include logs from past X days")
-parser.add_argument("--loop", type=int, help="Run repeatedly every X minutes")
+parser.add_argument("--loop", type=float, help="Continuously sync every X seconds (e.g., 5, 30, 0.5)")
 parser.add_argument("--export-simple", action="store_true", help="Export logs in simplified format (JSON array)")
 parser.add_argument("--export-normalized", action="store_true", help="Export normalized logs without uploading")
 args = parser.parse_args()
@@ -165,12 +165,12 @@ def run_upload():
 def main():
     """Main execution function, handles looping behavior."""
     if args.loop:
-        print(f"\n\U0001F501 Starting loop: syncing every {args.loop} minutes (Ctrl+C to stop)\n")
-        logging.info(f"Starting sync loop every {args.loop} minutes.")
+        print(f"\n\U0001F501 Starting loop: syncing every {args.loop} seconds (Ctrl+C to stop)\n")
+        logging.info(f"Starting sync loop every {args.loop} seconds.")
         try:
             while True:
                 run_upload()
-                time.sleep(args.loop * 60)
+                time.sleep(args.loop)
         except KeyboardInterrupt:
             print("\n\U0001F6D1 Sync loop stopped by user.")
             logging.info("Sync loop stopped by user.")
@@ -179,3 +179,10 @@ def main():
 
 def entrypoint():
     main()
+
+
+# Example Usage:
+# python cli.py --loop 30                  # sync every 30 seconds
+# python cli.py --since 2 --dry-run        # preview past 2 days of logs
+# python cli.py --export-simple            # export only
+

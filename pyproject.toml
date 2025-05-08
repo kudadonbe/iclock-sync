@@ -16,6 +16,7 @@ description = "Sync attendance logs from ZKTeco iClock devices to Firestore"
 authors = [
   { name="Hussain Shareef", email="hussain.shareef@gmail.com" }
 ]
+license = { text = "MIT" }
 readme = "README.md"
 requires-python = ">=3.8"
 dependencies = [
@@ -26,9 +27,21 @@ dependencies = [
   "tqdm"
 ]
 
+keywords = ["zk", "iclock", "firestore", "attendance", "biometric", "sync"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "Topic :: System :: Logging"
+]
+
+
 [tool.setuptools.packages.find]
 # Look for Python packages/modules in the current directory
 where = ["."]
 
 [project.scripts]
 iclock = "cli:entrypoint"
+
