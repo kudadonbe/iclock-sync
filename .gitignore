@@ -23,7 +23,7 @@ iclock_sync.egg-info/
 
 # Output data, caches, and logs
 output/
-# cache/
+cache/
 logs/
 
 # Virtual environment directories
