@@ -93,6 +93,9 @@ def run_upload():
     # Normalize Logs
     normalized_logs = [normalize_sdk_log(log) for log in raw_logs]
 
+    # Skip logs with empty staffId values
+    normalized_logs = [log for log in normalized_logs if str(log["staffId"]).strip()]
+
     # Export simplified logs if requested
     if args.export_simple:
         simple_logs = [convert_to_simple_log(log) for log in raw_logs]
@@ -122,6 +125,12 @@ def run_upload():
             skipped_count += 1
             continue
         logs_to_upload.append(log)
+
+    # Abort if suspiciously high volume of logs is queued for upload
+    if len(logs_to_upload) > 1000:
+        logging.error(f"Aborting upload: {len(logs_to_upload)} logs to upload exceeds safety limit")
+        print("\u274C Too many logs to upload (> 1000). Exiting to prevent potential error.")
+        return
 
     new_logs = []
     uploaded_count = 0
