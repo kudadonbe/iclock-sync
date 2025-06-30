@@ -65,7 +65,7 @@ def run_upload():
     """Executes the full log retrieval and upload process."""
     logging.info("iClock sync started.")
     device_names = [device['name'] for device in DEVICES]
-    print("\U0001F50D Devices loaded:", device_names)
+    print("Devices loaded:", device_names)
     logging.info(f"Devices loaded: {DEVICES}")
 
     timestamp_str = format_timestamp_str(datetime.now()).replace(":", "-").replace(" ", "_")
@@ -74,15 +74,15 @@ def run_upload():
     # Fetch Logs from Devices
     raw_logs = []
     for device in DEVICES:
-        print(f"\u2705 Connecting to {device['name']}")
+        print(f"Connecting to {device['name']}")
         logging.info(f"Connecting to {device['name']} at {device['ip']}")
         device_logs = get_logs_from_device(device['ip'])
-        print(f"\U0001F4CC Retrieved {len(device_logs)} records from {device['name']}")
+        print(f"Retrieved {len(device_logs)} records from {device['name']}")
         logging.info(f"Retrieved {len(device_logs)} records from {device['name']} ({device['ip']})")
         raw_logs.extend(device_logs)
 
     total_records = len(raw_logs)
-    print(f"\U0001F4CC Total records fetched from all devices: {total_records}")
+    print(f"Total records fetched from all devices: {total_records}")
     logging.info(f"Total records fetched from all devices: {total_records}")
 
     if args.since is not None:
@@ -103,7 +103,7 @@ def run_upload():
         with open(simple_output_file, "w", encoding="utf-8") as f:
             json.dump(simple_logs, f, indent=4)
         logging.info(f"Exported simplified logs to {simple_output_file}")
-        print(f"\U0001F4C4 Exported simplified logs to {simple_output_file}")
+        print(f"Exported simplified logs to {simple_output_file}")
 
     # Export normalized logs if requested
     if args.export_normalized:
@@ -111,7 +111,7 @@ def run_upload():
         with open(normalized_output_file, "w", encoding="utf-8") as f:
             json.dump(normalized_logs, f, indent=4, default=str)
         logging.info(f"Exported normalized logs to {normalized_output_file}")
-        print(f"\U0001F4C4 Exported normalized logs to {normalized_output_file}")
+        print(f"Exported normalized logs to {normalized_output_file}")
 
     if args.export_simple or args.export_normalized:
         return
@@ -129,12 +129,12 @@ def run_upload():
     # Abort if suspiciously high volume of logs is queued for upload
     if len(logs_to_upload) > 1000:
         logging.error(f"Aborting upload: {len(logs_to_upload)} logs to upload exceeds safety limit")
-        print("\u274C Too many logs to upload (> 1000). Exiting to prevent potential error.")
+        print("Too many logs to upload (> 1000). Exiting to prevent potential error.")
         return
 
     new_logs = []
     uploaded_count = 0
-    for log in tqdm(logs_to_upload, desc="\u2601\ufe0f Uploading logs", unit=" log"):
+    for log in tqdm(logs_to_upload, desc="Uploading logs", unit=" log"):
         if args.dry_run:
             new_logs.append(log)
         else:
@@ -150,38 +150,38 @@ def run_upload():
 
     if skipped_count:
         logging.info(f"Skipped {skipped_count} already-uploaded logs.")
-        print(f"\u23e9 Skipped {skipped_count} already-uploaded logs.")
+        print(f"Skipped {skipped_count} already-uploaded logs.")
 
     if args.dry_run:
-        print(f"\n\U0001F9EA Dry run complete — {len(new_logs)} logs *would* be uploaded.")
+        print(f"\nDry run complete — {len(new_logs)} logs *would* be uploaded.")
         logging.info(f"Dry run complete - {len(new_logs)} logs would be uploaded.")
     else:
-        print(f"\n\u2601\ufe0f Upload complete — {uploaded_count} new logs uploaded.")
+        print(f"\nUpload complete — {uploaded_count} new logs uploaded.")
         logging.info(f"Upload complete - {uploaded_count} new logs uploaded.")
 
         if new_logs:
             with open(output_file, "w", encoding="utf-8") as f:
                 json.dump(new_logs, f, indent=4, default=str)
             logging.info(f"Saved {len(new_logs)} new logs to {output_file}")
-            print(f"\U0001F4BE Saved {len(new_logs)} new logs to {output_file}")
+            print(f"Saved {len(new_logs)} new logs to {output_file}")
 
             uploaded_doc_ids.update([log["doc_id"] for log in new_logs])
             save_uploaded_ids_cache(uploaded_doc_ids)
         else:
-            print("\U0001F4C1 No new logs to save.")
+            print("No new logs to save.")
             logging.info("No new logs to save.")
 
 def main():
     """Main execution function, handles looping behavior."""
     if args.loop:
-        print(f"\n\U0001F501 Starting loop: syncing every {args.loop} seconds (Ctrl+C to stop)\n")
+        print(f"\nStarting loop: syncing every {args.loop} seconds (Ctrl+C to stop)\n")
         logging.info(f"Starting sync loop every {args.loop} seconds.")
         try:
             while True:
                 run_upload()
                 time.sleep(args.loop)
         except KeyboardInterrupt:
-            print("\n\U0001F6D1 Sync loop stopped by user.")
+            print("\nSync loop stopped by user.")
             logging.info("Sync loop stopped by user.")
     else:
         run_upload()
