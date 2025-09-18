@@ -12,6 +12,7 @@
 
 # Environment-specific and sensitive configuration
 .env
+config/*.json
 config/firebase-key.json
 
 # Python cache and bytecode files
