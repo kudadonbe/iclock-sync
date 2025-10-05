@@ -10,5 +10,5 @@ if %errorLevel% NEQ 0 (
 :: Change to the sync directory
 cd /d "C:\Program Files\iclock-sync"
 
-:: Start iClock in a new, minimized CMD that auto-closes when done
-start "" /min cmd /c "iclock --loop 5 --since 7"
+:: Start iClock in a new, minimized CMD that auto-closes when done, activating venv first
+start "" /min cmd /c "call .venv\Scripts\activate && iclock --loop 5 --since 7"
