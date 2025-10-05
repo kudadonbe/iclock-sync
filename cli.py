@@ -22,7 +22,8 @@ from core.firestore_uploader import upload_log_to_firestore
 from core.utils import (
     format_timestamp_str,
     load_uploaded_ids_cache,
-    save_uploaded_ids_cache
+    save_uploaded_ids_cache,
+    SmartTiming
 )
 
 import logging
@@ -63,6 +64,7 @@ OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 def run_upload():
     """Executes the full log retrieval and upload process."""
+    # Returns: uploaded_count for SmartTiming
     logging.info("iClock sync started.")
     device_names = [device['name'] for device in DEVICES]
     print("Devices loaded:", device_names)
@@ -192,19 +194,30 @@ def run_upload():
         if not new_logs:
             print("No new logs to save.")
             logging.info("No new logs to save.")
+    
+    # Return upload count for SmartTiming
+    return uploaded_count if not args.dry_run else len(new_logs) if 'new_logs' in locals() else 0
 
 def main():
     """Main execution function, handles looping behavior."""
     if args.loop:
-        print(f"Starting loop: syncing every {args.loop} seconds (Ctrl+C to stop)")
-        logging.info(f"Starting sync loop every {args.loop} seconds.")
+        # Use SmartTiming for graduated rest levels
+        smart_timer = SmartTiming(base_interval=args.loop)
+        print(f"Starting smart sync: base {args.loop}s with graduated rest (Active → Rest → Nap → Sleep → Dream)")
+        print("Schedule: Active(6-16) → Nap(16-18) → Sleep(18-23) → Dream(23-6)")
+        logging.info(f"Starting smart sync loop with base interval {args.loop}s.")
         try:
             while True:
-                run_upload()
-                time.sleep(args.loop)
+                uploaded_count = run_upload()
+                
+                # Get next interval based on activity and time of day
+                next_interval = smart_timer.get_next_interval(uploaded_count)
+                
+                print(f"Next sync in {next_interval}s")
+                time.sleep(next_interval)
         except KeyboardInterrupt:
-            print("Sync loop stopped by user.")
-            logging.info("Sync loop stopped by user.")
+            print("Smart sync stopped by user.")
+            logging.info("Smart sync stopped by user.")
     else:
         run_upload()
 

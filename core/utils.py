@@ -15,6 +15,136 @@ import os
 import logging
 from datetime import datetime
 
+
+# ----------------------------------------
+# Smart Timing Helper Class
+# ----------------------------------------
+
+class SmartTiming:
+    """Manages smart timing intervals with graduated rest levels: Active → Rest → Nap → Sleep → Dream."""
+    
+    def __init__(self, base_interval=5):
+        """
+        Initialize smart timing with graduated rest levels.
+        
+        Args:
+            base_interval: Active sync interval (seconds)
+        """
+        self.base_interval = base_interval
+        self.current_interval = base_interval
+        self.no_activity_count = 0
+        
+        # Rest level definitions
+        self.rest_levels = {
+            'active': {'max_interval': 5, 'cycles': 0},           # Always 5s
+            'rest': {'max_interval': 300, 'cycles': 1},           # 5 minutes max
+            'nap': {'max_interval': 900, 'cycles': 3},            # 15 minutes max  
+            'sleep': {'max_interval': 3600, 'cycles': 6},         # 1 hour max
+            'dream': {'max_interval': 10800, 'cycles': 10}        # 3 hours max
+        }
+        
+    def get_time_period(self):
+        """Determine current time period based on hour of day."""
+        current_hour = datetime.now().hour
+        
+        if 6 <= current_hour < 16:
+            return 'active_hours'      # 06:00-16:00: Can only Rest
+        elif 16 <= current_hour < 18:
+            return 'nap_hours'         # 16:00-18:00: Can Nap
+        elif 18 <= current_hour < 23:
+            return 'sleep_hours'       # 18:00-23:00: Can Sleep
+        else:
+            return 'dream_hours'       # 23:00-06:00: Can Dream
+    
+    def get_max_rest_level(self, time_period):
+        """Get maximum allowed rest level for current time period."""
+        max_levels = {
+            'active_hours': 'rest',    # Max: Rest (5min)
+            'nap_hours': 'nap',        # Max: Nap (15min)  
+            'sleep_hours': 'sleep',    # Max: Sleep (1hr)
+            'dream_hours': 'dream'     # Max: Dream (3hr)
+        }
+        return max_levels[time_period]
+    
+    def get_current_rest_level(self):
+        """Determine current rest level based on activity cycles."""
+        if self.no_activity_count == 0:
+            return 'active'
+        elif self.no_activity_count < 3:
+            return 'rest'
+        elif self.no_activity_count < 6:
+            return 'nap'
+        elif self.no_activity_count < 10:
+            return 'sleep'
+        else:
+            return 'dream'
+    
+    def get_next_interval(self, new_records_count):
+        """Calculate next sync interval with smart rest progression."""
+        current_hour = datetime.now().hour
+        
+        # Sharp wake-up at 06:00
+        if current_hour == 6 and self.current_interval > self.base_interval:
+            self.no_activity_count = 0
+            self.current_interval = self.base_interval
+            print("06:00 wake-up - reset to Active (5s intervals)")
+            return self.current_interval
+        
+        # Activity detected - wake up
+        if new_records_count > 0:
+            self.no_activity_count = 0
+            old_interval = self.current_interval
+            self.current_interval = self.base_interval
+            if old_interval > self.base_interval:
+                print(f"Activity detected - wake up to Active (5s intervals)")
+            return self.current_interval
+        
+        # No activity - progress through rest levels
+        time_period = self.get_time_period()
+        max_allowed_level = self.get_max_rest_level(time_period)
+        current_level = self.get_current_rest_level()
+        
+        # Don't exceed time period limits
+        if self.rest_levels[current_level]['cycles'] > self.rest_levels[max_allowed_level]['cycles']:
+            current_level = max_allowed_level
+        
+        self.no_activity_count += 1
+        old_interval = self.current_interval
+        
+        # Get max interval for current level
+        max_interval = self.rest_levels[current_level]['max_interval']
+        
+        # Gradual scaling within the level
+        if current_level == 'active':
+            self.current_interval = self.base_interval
+        else:
+            self.current_interval = min(
+                int(self.current_interval * 1.5), 
+                max_interval
+            )
+        
+        # Log level changes
+        if self.current_interval != old_interval:
+            level_name = current_level.title()
+            max_time = self._format_duration(max_interval)
+            print(f"Entering {level_name} (max {max_time}) - interval: {old_interval}s → {self.current_interval}s")
+        
+        return self.current_interval
+    
+    def _format_duration(self, seconds):
+        """Format seconds into human-readable duration."""
+        if seconds < 60:
+            return f"{seconds}s"
+        elif seconds < 3600:
+            return f"{seconds//60}min"
+        else:
+            return f"{seconds//3600}hr"
+    
+    def reset(self):
+        """Reset to active state."""
+        self.current_interval = self.base_interval
+        self.no_activity_count = 0
+
 # ----------------------------------------
 # Timestamp Formatting Utilities
 # ----------------------------------------
