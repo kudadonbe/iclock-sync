@@ -11,7 +11,7 @@
 
 [project]
 name = "iclock-sync"
-version = "1.0.0"
+version = "1.1.0" # Minor version bump for significant improvements
 description = "Sync attendance logs from ZKTeco iClock devices to Firestore"
 authors = [
   { name="Hussain Shareef", email="hussain.shareef@gmail.com" }
