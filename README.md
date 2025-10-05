@@ -23,7 +23,7 @@
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/your-username/iclock-sync.git
+git clone https://github.com/kudadonbe/iclock-sync.git
 cd iclock-sync
 ```
 
