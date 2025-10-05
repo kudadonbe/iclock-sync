@@ -44,14 +44,37 @@ def upload_log_to_firestore(log: dict):
             - workCode: Associated work code or reason.
 
     Returns:
-        bool: True if the log was successfully uploaded, False if it already existed.
+        str: "exists" if the log already existed, "uploaded" if successfully uploaded, False on error.
     """
+    # Validate required fields before upload
+    required_fields = ["doc_id", "staffId", "timestamp", "status", "workCode"]
+    for field in required_fields:
+        if field not in log or log[field] is None:
+            logging.error(f"Missing required field '{field}' in log: {log}")
+            return False
+    
+    # Validate staffId is not empty or invalid
+    staff_id = str(log["staffId"]).strip()
+    if not staff_id or staff_id == "None" or staff_id == "0":
+        logging.error(f"Invalid staffId '{log['staffId']}' in log: {log['doc_id']}")
+        return False
+    
+    # Validate staffId is numeric
+    try:
+        staff_id_int = int(staff_id)
+        if staff_id_int <= 0:
+            logging.error(f"Invalid staffId '{staff_id}' must be positive integer: {log['doc_id']}")
+            return False
+    except (ValueError, TypeError):
+        logging.error(f"Invalid staffId '{staff_id}' must be numeric: {log['doc_id']}")
+        return False
+    
     doc_ref = db.collection("staffAttendanceLogs").document(log["doc_id"])
 
     # Check if the document already exists to prevent duplication
     if doc_ref.get().exists:
         logging.info(f"Log already exists in Firestore: {log['doc_id']}")
-        return False
+        return "exists"
 
     # Prepare the data payload for Firestore
     doc_data = {
@@ -65,4 +88,4 @@ def upload_log_to_firestore(log: dict):
     # Save the document to Firestore
     doc_ref.set(doc_data)
     # logging.info(f"Log uploaded to Firestore: {log['doc_id']}")
-    return True
+    return "uploaded"

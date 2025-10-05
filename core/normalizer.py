@@ -30,7 +30,22 @@ def normalize_sdk_log(log):
               - timestamp: Datetime object representing attendance time.
               - status: Integer status code.
               - workCode: Integer representing the work code.
+              
+    Raises:
+        ValueError: If user_id is invalid (None, empty, 0, or non-numeric).
     """
+    # Validate staffId before processing
+    if not log.user_id or log.user_id == 0 or str(log.user_id).strip() == "" or str(log.user_id).strip() == "None":
+        raise ValueError(f"Invalid staffId: {log.user_id} - cannot normalize log")
+    
+    # Additional validation: ensure staffId is numeric
+    try:
+        staff_id_int = int(log.user_id)
+        if staff_id_int <= 0:
+            raise ValueError(f"Invalid staffId: {log.user_id} - must be positive integer")
+    except (ValueError, TypeError):
+        raise ValueError(f"Invalid staffId: {log.user_id} - must be numeric")
+    
     doc_id = generate_doc_id(log.user_id, log.timestamp)
 
     return {

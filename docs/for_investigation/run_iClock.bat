@@ -98,9 +98,9 @@ for /L %%R in (1,1,%RETRIES%) do (
 
 :: Final check and launch
 if "!FOUND!"=="1" (
-    echo All checks passed. Starting: iclock --loop 300 --since 7 >> "%LOGFILE%"
-    echo Running command: iclock --loop 300 --since 7
-    iclock --loop 300 --since 7
+    echo All checks passed. Starting: iclock --loop 5 >> "%LOGFILE%"
+    echo Running command: iclock --loop 5
+    iclock --loop 5
     echo Sync process finished or running in loop. >> "%LOGFILE%"
 ) else (
     echo ERROR: Access checks failed. >> "%LOGFILE%"
